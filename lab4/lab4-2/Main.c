@@ -85,7 +85,7 @@ struct node *inputList()
 	return first;
 }
 
-struct node* search_list(struct node *list,char *word)
+struct node* searchStruct(struct node *list,char *word)
 {
 	int flag = 0;
 	struct node *current = list;
@@ -102,6 +102,34 @@ struct node* search_list(struct node *list,char *word)
 	return NULL;
 }
 
+void freeStruct(struct node *list)
+{
+	while (list != NULL)
+	{
+		struct node *nextNode = NULL;
+		free(list->dict.word);
+		free(list->dict.useInCentence);
+		free(list->dict.translation);
+		nextNode = list->next;
+		free(list);
+		list = nextNode;
+	}
+}
+
+void showStruct(struct node *list)
+{
+	struct node *node = list;
+	int i = 1;
+	printf("\nВсе записи в словаре:\n");
+	while (node != NULL)
+	{
+		printf("Слово %i: %s\n", i, node->dict.word);
+		printf("Перевод %i: %s\n", i, node->dict.translation);
+		printf("Пример в предложении %i: %s\n", i, node->dict.useInCentence);
+		i = i + 1;
+		node = node->next;
+	}
+}
 
 int main(void)
 {
@@ -109,7 +137,8 @@ int main(void)
 
 	struct node *list = inputList();
 	struct node *searchRes = NULL;
-	struct node *nextNode = NULL;
+
+	showStruct(list);
 
 	char con_input[100];
 	printf("\n\nВведите 0 чтобы выйти\n");
@@ -122,22 +151,14 @@ int main(void)
 			break;
 
 		OemToAnsi(con_input, con_input);
-		searchRes = search_list(list, con_input);
+		searchRes = searchStruct(list, con_input);
 		if (searchRes == NULL)
 			printf("Искомый перевод не найден\n");
 		else
 			printf("Слово: %s\nПример в предложении: %s\n", searchRes->dict.word, searchRes->dict.useInCentence);
 	}
 
-	while(list != NULL)
-	{
-		free(list->dict.word);
-		free(list->dict.useInCentence);
-		free(list->dict.translation);
-		nextNode = list->next;
-		free(list);
-		list = nextNode;
-	}
+	freeStruct(list);
 
 	return 0;
 }
